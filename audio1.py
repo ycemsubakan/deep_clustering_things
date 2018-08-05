@@ -89,7 +89,7 @@ for ep in range(EP):
             cost = cost + term1 + term2
 
         if (ep % 100) == 0:
-            out_mask = (out[0].data.cpu().reshape(-1, L, 2)[:, :, 0].t() > 0.5).float()
+            out_mask = (out[0].data.cpu().reshape(-1, L, 2).max(2)[1].t()).float()
             vis.heatmap(out_mask, win='out_map')
             
             # reconstruct the sound for training estimate for source 1
@@ -111,7 +111,7 @@ for ep in range(EP):
                 test_phases = data_test[0][1][0].t()
 
             out_test = mrnn.forward(test_specs)
-            out_mask_test = (out_test.data[0].reshape(-1, L, 2)[:, :, 0].cpu().t() < 0.5).float()
+            out_mask_test = (out_test.data[0].reshape(-1, L, 2).max(2)[1].cpu().t()).float()
             
             # reconstruct the sound for test estimate for source 1
             test_hat1 = out_mask_test.numpy() * test_specs[0].cpu().t().numpy() * np.exp(1j*test_phases.numpy())
